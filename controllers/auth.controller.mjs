@@ -6,19 +6,29 @@ import { createHash, randomBytes } from "node:crypto"
 import nodemailer from "nodemailer"
 
 const register = asyncHanlder(async(request, response) => {
-    const { name, email, password, address, workphone_no, cellphone_no, dob } = request.body
+    const { name, email, password, role } = request.body
 
-    if(!name || !email || !password || !address || !workphone_no || !cellphone_no || !dob){
+    if (typeof name !== 'string' || typeof email !== 'string' || typeof password !== 'string' || !name.trim() || !email.trim() || !password){
         return response.status(400).json({ message: `All fields are required.` })
     }
 
+    const normalizedRole = typeof role === 'string' && role.trim()
+        ? role.trim().toLowerCase()
+        : 'attendee'
+
+    if (!['attendee', 'exhibitor'].includes(normalizedRole)) {
+        return response.status(400).json({ message: 'Invalid role.', success: false })
+    }
+
+    const normalizedEmail = email.trim().toLowerCase()
+
     const userExists = await User.findOne({
-        $or: [{ email }, { workphone_no }, { cellphone_no }]
+        email: normalizedEmail
     })
 
     if(userExists){
         return response.status(400).json({ 
-            message: `Email or phone number is already registered.`,
+            message: `Email is already registered.`,
             success: false
         })
     }
@@ -28,12 +38,12 @@ const register = asyncHanlder(async(request, response) => {
     let user
     try {
         user = await User.create({
-            name, email, password: hashPassword, address, workphone_no, cellphone_no, dob
+            name: name.trim(), email: normalizedEmail, password: hashPassword, role: normalizedRole
         })
     } catch(error) {
         if(error.code === 11000){
             return response.status(400).json({
-                message: `Email or phone number is already registered.`,
+                message: `Email is already registered.`,
                 success: false
             })
         }
@@ -90,10 +100,7 @@ const login = asyncHanlder(async(request, response) => {
             name: user.name, 
             email: user.email,
             role: user.role,
-            address: user.address,
-            workphone_no: user.workphone_no,
-            cellphone_no: user.cellphone_no,
-            dob: user.dob,
+            
             token 
         })    
 })
@@ -174,7 +181,7 @@ const resetPassword = asyncHanlder(async (request, response) => {
         email: email.trim().toLowerCase(),
         passwordResetToken: hashedToken,
         passwordResetExpires: { $gt: new Date() }
-    })
+    }).select("+passwordResetToken +passwordResetExpires")
 
     if (!user) {
         return response.status(400).json({ message: "The reset code is invalid or has expired. Request a new code and try again." })

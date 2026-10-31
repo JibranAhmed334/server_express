@@ -33,3 +33,25 @@ const seeder = async ()=>{
 }
 
 seeder()
+
+
+
+
+// PORT=3000
+
+// MONGO_ALTAS_URI=mongodb+srv://ahmedjibran469_db_user:piUfQuYE037rukYC@cluster0.bace257.mongodb.net/
+
+// SECRET_KEY=example_ecommerce_application_secret_key
+
+// ADMIN_EMAIL=jibran@gmail.com
+
+// ADMIN_PASSWORD=123456
+
+
+// CLOUDINARY_CLOUD_NAME=uwlozjf9
+// CLOUDINARY_API_KEY=396458856872711
+// CLOUDINARY_API_SECRET=XCsYJPuA9GxKXcUZFHZlpIKhGEM
+    
+    
+// ahmedjibran469_db_user
+// piUfQuYE037rukYC

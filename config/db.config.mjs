@@ -4,10 +4,10 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const connectDb = async () => {
-  const DB_NAME = "ecommerce_db";
+  const DB_NAME = "EventSphere";
 
   try {
-    const conn = await mongoose.connect(`${process.env.MONGO_ALTAS_URI}/${DB_NAME}`);
+    const conn = await mongoose.connect(process.env.MONGO_ALTAS_URI, { dbName: DB_NAME });
     console.log(`Connected to: ${conn.connection.host}`);
     console.log(`Connected database: ${conn.connection.name}`);
   } catch (error) {
